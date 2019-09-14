@@ -218,12 +218,12 @@ nyt = {
    'yield': 'About 1 1/2 pints'
 }
 
-scraper = AbstractScraper('https://www.melskitchencafe.com/zucchini-banana-bread/')
+scraper = AbstractScraper('https://www.allrecipes.com/recipe/25037/best-big-fat-chewy-chocolate-chip-cookie/')
 #scraper = AbstractScraper('https://www.crazyforcrust.com/best-chocolate-chip-cookie-recipe/')
 #scraper = AbstractScraper('https://cooking.nytimes.com/recipes/1016605-the-only-ice-cream-recipe-youll-ever-need')
-sels = scraper.grab_selectors(lookups)
+#sels = scraper.grab_selectors(lookups)
 
-scraper.grab_recipe(sels)
+scraper.grab_recipe(selectors)
 
 #otherscraper = AbstractScraper('https://www.nourish-and-fete.com/easy-flour-tortillas-from-scratch/')
 
