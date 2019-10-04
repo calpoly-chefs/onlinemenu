@@ -1,6 +1,7 @@
 from app.main.model.user import User
 from ..service.blacklist_service import save_token
 
+import sys
 
 class Auth:
 
@@ -8,9 +9,9 @@ class Auth:
    def login_user(data):
       try:
          # fetch the user data
-         user = User.query.filter_by(email=data.get('email')).first()
+         user = User.query.filter_by(username=data.get('username')).first()
          if user and user.check_password(data.get('password')):
-               auth_token = user.encode_auth_token(user.id)
+               auth_token = user.encode_auth_token(user.username)
                if auth_token:
                   response_object = {
                      'status': 'success',
@@ -21,7 +22,7 @@ class Auth:
          else:
                response_object = {
                   'status': 'fail',
-                  'message': 'email or password does not match.'
+                  'message': 'username or password does not match.'
                }
                return response_object, 401
 
@@ -62,13 +63,12 @@ class Auth:
       # get the auth token
       auth_token = new_request.headers.get('Authorization')
       if auth_token:
-         resp = User.decode_auth_token(auth_token)
-         if not isinstance(resp, str):
-               user = User.query.filter_by(id=resp).first()
+         uname = User.decode_auth_token(auth_token)
+         if isinstance(uname, str):
+               user = User.query.filter_by(username=uname).first()
                response_object = {
                   'status': 'success',
                   'data': {
-                     'user_id': user.id,
                      'username': user.username,
                      'admin': user.admin,
                      'name': user.name,
@@ -78,7 +78,7 @@ class Auth:
                return response_object, 200
          response_object = {
                'status': 'fail',
-               'message': resp
+               'message': uname
          }
          return response_object, 401
       else:

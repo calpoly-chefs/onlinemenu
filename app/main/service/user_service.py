@@ -1,19 +1,21 @@
-import uuid
 import datetime
 
 from app.main import db
-from app.main.model.user import User
+from app.main.model.user import User, user_following
+
+#TODO remove sys import, was for testing
+import sys
 
 
 def save_new_user(data):
    user = User.query.filter_by(email=data['email']).first()
    if not user:
       new_user = User(
-         public_id=str(uuid.uuid4()),
          name=data['name'],
          email=data['email'],
          username=data['username'],
          password=data['password'],
+         bio=data['bio'],
          registered_on=datetime.datetime.utcnow()
       )
       save_changes(new_user)
@@ -25,11 +27,32 @@ def save_new_user(data):
       }
       return response_object, 409
 
+def update_existing_user(user, data):
+   usr = User.query.filter_by(username=user).first()
+
+   # check if username changed, and if the new username is already taken
+   if user != data['username'] and User.query.filter_by(username=data['username']).first() != None:
+      return {
+         'status': 'fail',
+         'message': 'That username is already taken'
+      }, 409
+
+   usr.name = data['name']
+   usr.email = data['email']
+   usr.username = data['username']
+   usr.bio = data['bio']
+
+   db.session.commit()
+   return {
+      'status': 'success',
+      'message': 'User successfully updated'
+   }, 200
+
 
 def generate_token(user):
    try:
       # generate the auth token
-      auth_token = user.encode_auth_token(user.id)
+      auth_token = user.encode_auth_token(user.username)
       response_object = {
          'status': 'success',
          'message': 'Successfully registered.',
@@ -47,10 +70,39 @@ def get_all_users():
    return User.query.all()
 
 
-def get_a_user(public_id):
-   return User.query.filter_by(public_id=public_id).first()
+def get_a_user(user, other_user):
+   _user = User.query.filter_by(username=other_user).first()
+
+   # add 'is_following' field if user is not other user
+   if user != other_user:
+      user_dict = _user.__dict__
+      user_dict['is_following'] = (db.session.query(user_following)
+                  .filter(user_following.c.user_username==user)
+                  .filter(user_following.c.following_username==other_user).first() != None)
+
+
+   return _user
 
 
 def save_changes(data):
    db.session.add(data)
+   db.session.commit()
+
+#TODO finish implementing toggle_follow_user
+def toggle_follow_user(user, to_follow):
+   is_following = (db.session.query(user_following)
+               .filter(user_following.c.user_username==user)
+               .filter(user_following.c.following_username==to_follow).first() != None)
+   usr = User.query.filter_by(username=user).first()
+   usr_to_follow = User.query.filter_by(username=to_follow).first()
+
+   if (is_following):
+      print("{} already following {}".format(user, to_follow), file=sys.stderr)
+      usr.following.remove(usr_to_follow)
+
+   else:
+      print("Was not already following", file=sys.stderr)
+      usr.following.append(usr_to_follow)
+
+   db.session.add(usr)
    db.session.commit()

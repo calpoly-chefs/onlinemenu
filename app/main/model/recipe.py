@@ -1,8 +1,12 @@
 from .. import db, flask_bcrypt
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.session import object_session
 import datetime
 import jwt
-from app.main.model.blacklist import BlacklistToken
 from ..config import key
+
+#TODO remove - only for debugging
+import sys
 
 class Recipe(db.Model):
    """ Recipe Model for storing recipes """
@@ -14,11 +18,12 @@ class Recipe(db.Model):
    cooktime = db.Column(db.String(255), nullable=False)
    preptime = db.Column(db.String(255), nullable=False)
    totaltime = db.Column(db.String(255), nullable=False)
-   username = db.Column(db.String(50), nullable=False)
-   remixcount = db.Column(db.Integer, nullable=False)
+   username = db.Column(db.String(50), db.ForeignKey('user.username'), nullable=False)
+   remixes = db.relationship("Recipe", backref=db.backref('parent', remote_side=[id]))
+   parent_id = db.Column(db.Integer, db.ForeignKey('recipe.id'))
    public = db.Column(db.Boolean)
    difficulty = db.Column(db.Integer, nullable=True)
-   rating = db.Column(db.Float, nullable=True)
+   likes = db.Column(db.Integer, nullable=True)
    servings = db.Column(db.String(255), nullable=False)
    source = db.Column(db.String(255), nullable=False)
    calories = db.Column(db.Integer, nullable=True)
@@ -29,8 +34,30 @@ class Recipe(db.Model):
    annotations = db.relationship('Annotation',
       backref='recipe',
       lazy=True,
-      cascade='all, delete-orphan')
+      cascade='all,delete,delete-orphan')
 
+   @hybrid_property
+   def remix_count(self):
+      print("Remixes: {}".format(self.remixes), file=sys.stderr)
+      return len(self.remixes)
+   
+   @remix_count.expression
+   def _remix_count_expression(cls):
+      q = db.select([db.func.count(Recipe.parent_id)]).\
+                where(Recipe.parent_id == cls.id).\
+                label("remix_count")
+      return q
+
+   @hybrid_property
+   def likes_count(self):
+      return len(self.likers)
+
+   @likes_count.expression
+   def _likes_count_expression(cls):
+      return (db.select([db.func.count(likes.c.username).label("likes_count")])
+               .where(likes.c.recipe_id == cls.id)
+               .label("sum_likes")
+               )
 
    def __repr__(self):
       return "<Recipe '{}'>".format(self.title)

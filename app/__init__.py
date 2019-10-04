@@ -24,6 +24,6 @@ api = Api(blueprint,
           authorizations=authorizations
           )
 
-api.add_namespace(user_ns, path='/user')
+api.add_namespace(user_ns, path='/users')
 api.add_namespace(auth_ns)
-api.add_namespace(recipe_ns, path='/recipe')
+api.add_namespace(recipe_ns, path='/recipes')
