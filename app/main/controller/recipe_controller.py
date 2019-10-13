@@ -41,7 +41,7 @@ class RecipeSingle(Resource):
       return update_recipe(data=data, user=user, recipe_id=recipe_id)
 
    @api.doc('get a single recipe in detail')
-   @api.marshal_list_with(_recipe, envelope='data')
+   @api.marshal_with(_recipe, envelope='data')
    @token_required
    def get(self, user, recipe_id):
       return get_one_recipe(user=user, recipe_id=recipe_id)

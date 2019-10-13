@@ -2,7 +2,8 @@ import uuid
 import datetime
 
 from app.main import db
-from app.main.model.recipe import Recipe, Annotation
+from app.main.model.recipe import Recipe, Step, Ingredient
+from app.main.model.tag import Tag
 from app.main.model.user import User, likes
 
 #TODO remove - only for debugging
@@ -12,83 +13,44 @@ def update_recipe(data, user, recipe_id):
    rec = Recipe.query.filter_by(id=recipe_id).first()
    if rec is None or rec.username != user:
       return {
-         'status': 'Failure',
+         'status': 'fail',
          'message': 'Could not find recipe',
       }, 404
 
-   updated_annotations = extract_annotations(data)
+   for s in data['steps']:
+      step = Step.query.filter_by(recipe_id=recipe_id).filter_by(number=s['number']).first()
+      if 'annotation' in s:
+         step.annotation = s['annotation']
+      else:
+         step.annotation = None
+      db.session.add(step)
 
-   #set foreign key for each annotation
-   for a in updated_annotations:
-      a.recipe_id = recipe_id
+   for i in data['ingredients']:
+      ing = Ingredient.query.filter_by(recipe_id=recipe_id).filter_by(number=i['number']).first()
+      if 'annotation' in i:
+         ing.annotation = i['annotation']
+      else:
+         i['annotation'] = None
+      db.session.add(ing)
 
-   print("annotations: {}".format(updated_annotations))
-   rec.annotations = updated_annotations.copy()
-   db.session.add_all(updated_annotations)
-   db.session.add(rec)
+   rec.featured_image = data['featured_image'] if 'featured_image' in data else None
+   rec.images = data['images'] if 'images' in data else None
+
    db.session.commit()
-   print("annotations: {}".format(rec.annotations))
-
 
    return {
          'status': 'Success',
          'message': 'Recipe updated',
       }, 200
 
-def extract_annotations(data):
-   new_annotations = []
-   
-   #separate ingredients from annotations, build association
-   for index, ing in enumerate(data['ingredients']):
-      if 'annotation' in ing:
-         new_annotations.append(Annotation(
-            text=ing['annotation'],
-            placement='ing',
-            number=index
-         ))
 
-   #separate steps from annotations, build an association
-   for index, stp in enumerate(data['steps']):
-      if 'annotation' in stp :
-         new_annotations.append(Annotation(
-            text=stp['annotation'],
-            placement='step',
-            number=index
-         ))
-
-   return new_annotations
-
-def update_fields(data, user):
-   new_annotations = []
-   
-   #separate ingredients from annotations, build association
-   ing_list = []
-   for index, ing in enumerate(data['ingredients']):
-      ing_list.append(ing['ingredient'])
-      if 'annotation' in ing:
-         new_annotations.append(Annotation(
-            text=ing['annotation'],
-            placement='ing',
-            number=index
-         ))
-
-   #separate steps from annotations, build an association
-   stp_list = []
-   for index, stp in enumerate(data['steps']):
-      stp_list.append(stp['step'])
-      if 'annotation' in stp :
-         new_annotations.append(Annotation(
-            text=stp['annotation'],
-            placement='step',
-            number=index
-         ))
-
-   #TODO query parent_id and make sure that circular dependencies are not allowed. (recipe remixing itself)
-
-   updated_recipe = Recipe(
+def save_new_recipe(data, user):
+   new_recipe = Recipe(
       title=data['title'],
-      parent_id=data['parent_id'] if 'parent_id' in data else None,
-      created_on= datetime.datetime.utcnow(),
+      parent_id=data['parent_id'] if 'parent_id' in data and Recipe.query.filter_by(id=data['parent_id']).first != None else None,
+      created_on=datetime.datetime.utcnow(),
+      images=data['images'] if 'images' in data else None,
+      featured_image=data['featured_image'] if 'featured_image' in data else None,
       cooktime=data['cooktime'],
       preptime=data['preptime'],
       totaltime=data['totaltime'],
@@ -99,15 +61,36 @@ def update_fields(data, user):
       calories=data['calories'],
       cost=data['cost'],
       description=data['description'],
-      ingredients="|".join(ing_list),
-      steps="|".join(stp_list)
    )
 
-   return (updated_recipe, new_annotations)
+   for t in data['tags']:
+      tag = Tag.query.filter_by(tagname=t).first()
+      if tag == None:
+         tag = Tag(tagname=t)
+      new_recipe.tags.append(tag)
 
-def save_new_recipe(data, user):
-   new_recipe, new_annotations = update_fields(data, user)
-   save_changes(new_recipe, new_annotations)
+   for num, i in enumerate(data['ingredients'], start=1):
+      new_recipe.ingredients.append(Ingredient(
+         text=i['text'], 
+         annotation=i['annotation'] if 'annotation' in i else None,
+         number=num
+      ))
+
+   for num, s in enumerate(data['steps'], start=1):
+      new_recipe.steps.append(Step(
+         text=s['text'],
+         annotation=s['annotation'] if 'annotation' in s else None,
+         number=num
+      ))
+
+
+   db.session.add(new_recipe)
+   db.session.add_all(new_recipe.ingredients)
+   db.session.add_all(new_recipe.steps)
+   db.session.add_all(new_recipe.tags)
+
+   db.session.commit()
+
    response_object = {
       'status': 'success',
       'message': 'Recipe successfully created.'
@@ -120,11 +103,9 @@ def toggle_recipe_like(user, recipe_id):
    rec = Recipe.query.filter_by(id=recipe_id).first()
 
    if (has_liked):
-      print("Has liked, unliking", file=sys.stderr)
       usr.liked_recipes.remove(rec)
 
    else:
-      print("No like, liking", file=sys.stderr)
       usr.liked_recipes.append(rec)
 
    db.session.add(usr)
@@ -134,16 +115,13 @@ def toggle_recipe_like(user, recipe_id):
    
 def get_all_recipes(user):
    recs = Recipe.query.all()
-
-   formatted = []
-
-   for rec in recs:
-      formatted.append(format_recipe(rec, user))
    
-   return formatted
+   return recs
 
 def get_one_recipe(user, recipe_id):
    rec = Recipe.query.filter_by(id=recipe_id).first()
+
+   rec.__dict__['has_liked'] = (db.session.query(likes).filter(likes.c.username==user).filter(likes.c.recipe_id==recipe_id).first() != None)
 
    if (rec is None):
       return {
@@ -151,8 +129,8 @@ def get_one_recipe(user, recipe_id):
          'message': 'recipe not found'
       }, 404
 
-   return format_recipe(rec, user)
-
+   return rec
+"""
 def format_recipe(rec, user):
    ings = []
    stps = []
@@ -185,7 +163,7 @@ def save_changes(rec, annos):
    db.session.add_all(annos)
    db.session.commit()
    print("annotations: {}".format(rec.annotations))
-
+"""
 def delete_one_recipe(user, recipe_id):
    db.session.delete(Recipe.query.filter(Recipe.username==user).filter(Recipe.id == recipe_id).first())
    db.session.commit()

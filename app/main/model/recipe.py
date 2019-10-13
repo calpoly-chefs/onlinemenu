@@ -15,6 +15,8 @@ class Recipe(db.Model):
    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
    title = db.Column(db.String(255), nullable=False)
    created_on = db.Column(db.DateTime, nullable=False)
+   featured_image = db.Column(db.String(255), nullable=True)
+   images = db.Column(db.ARRAY(db.String(255), dimensions=1), nullable=True)
    cooktime = db.Column(db.String(255), nullable=False)
    preptime = db.Column(db.String(255), nullable=False)
    totaltime = db.Column(db.String(255), nullable=False)
@@ -23,15 +25,16 @@ class Recipe(db.Model):
    parent_id = db.Column(db.Integer, db.ForeignKey('recipe.id'))
    public = db.Column(db.Boolean)
    difficulty = db.Column(db.Integer, nullable=True)
-   likes = db.Column(db.Integer, nullable=True)
    servings = db.Column(db.String(255), nullable=False)
    source = db.Column(db.String(255), nullable=False)
    calories = db.Column(db.Integer, nullable=True)
    cost = db.Column(db.Float, nullable=True)
    description = db.Column(db.Text) 
-   ingredients = db.Column(db.Text)
-   steps = db.Column(db.Text)
-   annotations = db.relationship('Annotation',
+   ingredients = db.relationship('Ingredient',
+      backref='recipe',
+      lazy=True,
+      cascade='all,delete,delete-orphan')
+   steps = db.relationship('Step',
       backref='recipe',
       lazy=True,
       cascade='all,delete,delete-orphan')
@@ -62,12 +65,26 @@ class Recipe(db.Model):
    def __repr__(self):
       return "<Recipe '{}'>".format(self.title)
 
-class Annotation(db.Model):
-   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-   recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
-   text = db.Column(db.String(255), nullable=False)
-   placement = db.Column(db.String(4), nullable=False)
-   number = db.Column(db.Integer, nullable=False)
+class Ingredient(db.Model):
+   """ Ingredient model - to be expanded upon"""
+   __tablename__ = "ingredient"
+
+   recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False, primary_key=True)
+   number = db.Column(db.Integer, primary_key=True)
+   text = db.Column(db.Text, nullable=False)
+   annotation = db.Column(db.String(255), nullable=True)
 
    def __repr__(self):
-      return "<Annotation '{}' '{}' '{}' '{}'>".format(self.recipe_id, self.placement, self.number, self.text)
+      return "<Ingredient {}-{}>".format(self.recipe_id, self.number)
+
+class Step(db.Model):
+   """ Step model """
+   __tablename__ = "step"
+
+   recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False, primary_key=True)
+   number = db.Column(db.Integer, primary_key=True)
+   text = db.Column(db.Text, nullable=False)
+   annotation = db.Column(db.String(255), nullable=True)
+
+   def __repr__(self):
+      return "<Step {}-{}>".format(self.recipe_id, self.number)

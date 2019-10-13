@@ -11,13 +11,15 @@ class AuthDto:
 class RecipeDto:
    api = Namespace('recipe', description='Recipe related operations')
    ingredient_fields = api.model('ingredient', {
-      'ingredient': fields.String,
-      'annotation': fields.String,
+      'text': fields.String,
+      'annotation': fields.String(required=False),
+      'number': fields.Integer
    })
 
    step_fields = api.model('step', {
-      'step': fields.String,
-      'annotation': fields.String,
+      'text': fields.String,
+      'annotation': fields.String(required=False),
+      'number': fields.Integer
    })
 
    recipe_short = api.model('recipe_short', {
@@ -28,6 +30,8 @@ class RecipeDto:
       'remix_count': fields.Integer,
       'likes_count': fields.Integer,
       'description': fields.String,
+      'featured_image': fields.String,
+      'tags': fields.List(fields.String)
    })
 
    recipe_create = api.model('recipe_create', {
@@ -45,6 +49,8 @@ class RecipeDto:
       'cost': fields.Integer,
       'difficulty': fields.Integer,
       'description': fields.String,
+      'featured_image': fields.String,
+      'images': fields.List(fields.String),
       'ingredients': fields.List(
          fields.Nested(ingredient_fields),
          required=True,
@@ -52,7 +58,8 @@ class RecipeDto:
       'steps': fields.List(
          fields.Nested(step_fields),
          required=True,
-         description='The steps & associated annotations')
+         description='The steps & associated annotations'),
+      'tags': fields.List(fields.String)
    })
 
    recipe = api.model('recipe', {
@@ -73,6 +80,8 @@ class RecipeDto:
       'likes_count': fields.Integer,
       'has_liked': fields.Boolean,
       'description': fields.String,
+      'featured_image': fields.String,
+      'images': fields.List(fields.String),
       'remixes': fields.List(
          fields.Nested(recipe_short),
          required=False,
@@ -84,7 +93,8 @@ class RecipeDto:
       'steps': fields.List(
          fields.Nested(step_fields),
          required=True,
-         description='The steps & associated annotations')
+         description='The steps & associated annotations'),
+      'tags': fields.List(fields.String)
    })
 
 class UserDto:

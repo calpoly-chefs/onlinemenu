@@ -6,7 +6,7 @@ from app.main.model.blacklist import BlacklistToken
 from ..config import key
 
 likes = db.Table('likes',
-                 db.Column('username', db.Integer, db.ForeignKey('user.username')),
+                 db.Column('username', db.String(50), db.ForeignKey('user.username')),
                  db.Column('recipe_id', db.Integer, db.ForeignKey('recipe.id')))
 
 class User(db.Model):
@@ -22,6 +22,7 @@ class User(db.Model):
    username = db.Column(db.String(50), unique=True, primary_key=True)
    password_hash = db.Column(db.String(100))
    badges = db.Column(db.String(50), unique=False, nullable=True)
+   profile_image = db.Column(db.String(255), nullable=True)
    bio = db.Column(db.Text)
    recipes = db.relationship("Recipe")
    following = db.relationship(
@@ -105,6 +106,6 @@ class User(db.Model):
 
 user_following = db.Table(
     'user_following',
-    db.Column('user_username', db.Integer, db.ForeignKey(User.username), primary_key=True),
-    db.Column('following_username', db.Integer, db.ForeignKey(User.username), primary_key=True)
+    db.Column('user_username', db.String(50), db.ForeignKey(User.username), primary_key=True),
+    db.Column('following_username', db.String(50), db.ForeignKey(User.username), primary_key=True)
 )

@@ -17,6 +17,8 @@ flask-migrate = "*"
 pyjwt = "*"
 flask-script = "*"
 flask-testing = "*"
+awsebcli = "*"
+psycopg2 = "~=2.7.1"
 
 [requires]
 python_version = "3.7"

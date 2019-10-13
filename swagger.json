@@ -1,0 +1,745 @@
+{
+    "swagger": "2.0",
+    "basePath": "/",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "operationId": "user login",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/auth_details"
+                        }
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "operationId": "logout a user",
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/recipes/": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/recipe_short"
+                            }
+                        }
+                    }
+                },
+                "summary": "List all recipes",
+                "operationId": "list of all recipes",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "recipe"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "201": {
+                        "description": "Recipe successfully created."
+                    }
+                },
+                "summary": "Creates a new Recipe",
+                "operationId": "create a new recipe",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/recipe_create"
+                        }
+                    }
+                ],
+                "tags": [
+                    "recipe"
+                ]
+            }
+        },
+        "/recipes/{recipe_id}": {
+            "parameters": [
+                {
+                    "name": "recipe_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/recipe"
+                        }
+                    }
+                },
+                "operationId": "get a single recipe in detail",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "recipe"
+                ]
+            },
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Updates an existing recipe",
+                "operationId": "update a recipe's annotations",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/recipe_create"
+                        }
+                    }
+                ],
+                "tags": [
+                    "recipe"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "operationId": "delete a single recipe",
+                "tags": [
+                    "recipe"
+                ]
+            }
+        },
+        "/recipes/{recipe_id}/like": {
+            "parameters": [
+                {
+                    "name": "recipe_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "operationId": "toggle liking a recipe",
+                "tags": [
+                    "recipe"
+                ]
+            }
+        },
+        "/users/": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/user_short"
+                            }
+                        }
+                    }
+                },
+                "summary": "List all registered users",
+                "operationId": "list_of_registered_users",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "user"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "201": {
+                        "description": "User successfully created."
+                    }
+                },
+                "summary": "Creates a new User",
+                "operationId": "create a new User",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/user_create"
+                        }
+                    }
+                ],
+                "tags": [
+                    "user"
+                ]
+            }
+        },
+        "/users/follow/{user_to_follow}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "The username of the User to follow/unfollow",
+                    "name": "user_to_follow",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "User not found."
+                    }
+                },
+                "operationId": "toggle following a user",
+                "tags": [
+                    "user"
+                ]
+            }
+        },
+        "/users/other/{user_name}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "The username of the User",
+                    "name": "user_name",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/user_detail"
+                        }
+                    }
+                },
+                "summary": "get a user given its Username",
+                "operationId": "get a user",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "user"
+                ]
+            }
+        },
+        "/users/self": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/user_detail"
+                        }
+                    }
+                },
+                "summary": "Gets detail about logged in user",
+                "operationId": "get self detail",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "type": "string",
+                        "format": "mask",
+                        "description": "An optional fields mask"
+                    }
+                ],
+                "tags": [
+                    "user"
+                ]
+            },
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Updates the logged in user",
+                "operationId": "update the logged in User",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/user_create"
+                        }
+                    }
+                ],
+                "tags": [
+                    "user"
+                ]
+            }
+        }
+    },
+    "info": {
+        "title": "littleChef back end",
+        "version": "0.1",
+        "description": "The REST API running the tinyWaiter"
+    },
+    "produces": [
+        "application/json"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "Bearer Auth": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
+        }
+    },
+    "tags": [
+        {
+            "name": "user",
+            "description": "user related operations"
+        },
+        {
+            "name": "auth",
+            "description": "authentication related operations"
+        },
+        {
+            "name": "recipe",
+            "description": "Recipe related operations"
+        }
+    ],
+    "definitions": {
+        "user_create": {
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "description": "user email address"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "user username"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "user password"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "users name"
+                },
+                "bio": {
+                    "type": "string",
+                    "description": "users bio"
+                }
+            },
+            "type": "object"
+        },
+        "user_short": {
+            "required": [
+                "username"
+            ],
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "description": "user username"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "users name"
+                },
+                "recipe_count": {
+                    "type": "integer"
+                },
+                "following_count": {
+                    "type": "integer"
+                },
+                "total_likes": {
+                    "type": "integer"
+                },
+                "badges": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "user_detail": {
+            "required": [
+                "email",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "description": "user email address"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "user username"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "users name"
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "recipe_count": {
+                    "type": "integer"
+                },
+                "total_likes": {
+                    "type": "integer"
+                },
+                "badges": {
+                    "type": "string"
+                },
+                "is_following": {
+                    "type": "boolean"
+                },
+                "following": {
+                    "type": "array",
+                    "description": "The other users that a user follows",
+                    "items": {
+                        "$ref": "#/definitions/user_short"
+                    }
+                },
+                "recipes": {
+                    "type": "array",
+                    "description": "All of a User's Recipes, in short form",
+                    "items": {
+                        "$ref": "#/definitions/recipe_short"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "recipe_short": {
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "totaltime": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "remix_count": {
+                    "type": "integer"
+                },
+                "likes_count": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "featured_image": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "auth_details": {
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "description": "The user username"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "The user password"
+                }
+            },
+            "type": "object"
+        },
+        "recipe_create": {
+            "required": [
+                "ingredients",
+                "steps"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "cooktime": {
+                    "type": "string"
+                },
+                "preptime": {
+                    "type": "string"
+                },
+                "totaltime": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "public": {
+                    "type": "boolean"
+                },
+                "servings": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "calories": {
+                    "type": "integer"
+                },
+                "cost": {
+                    "type": "integer"
+                },
+                "difficulty": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "featured_image": {
+                    "type": "string"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "ingredients": {
+                    "type": "array",
+                    "description": "The ingredients & associated annotations",
+                    "items": {
+                        "$ref": "#/definitions/ingredient"
+                    }
+                },
+                "steps": {
+                    "type": "array",
+                    "description": "The steps & associated annotations",
+                    "items": {
+                        "$ref": "#/definitions/step"
+                    }
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "ingredient": {
+            "properties": {
+                "text": {
+                    "type": "string"
+                },
+                "annotation": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "step": {
+            "properties": {
+                "text": {
+                    "type": "string"
+                },
+                "annotation": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "recipe": {
+            "required": [
+                "ingredients",
+                "steps"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "cooktime": {
+                    "type": "string"
+                },
+                "preptime": {
+                    "type": "string"
+                },
+                "totaltime": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "remix_count": {
+                    "type": "integer"
+                },
+                "public": {
+                    "type": "boolean"
+                },
+                "servings": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "calories": {
+                    "type": "integer"
+                },
+                "cost": {
+                    "type": "integer"
+                },
+                "difficulty": {
+                    "type": "integer"
+                },
+                "likes_count": {
+                    "type": "integer"
+                },
+                "has_liked": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "featured_image": {
+                    "type": "string"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "remixes": {
+                    "type": "array",
+                    "description": "All remixes of this recipe, in short form",
+                    "items": {
+                        "$ref": "#/definitions/recipe_short"
+                    }
+                },
+                "ingredients": {
+                    "type": "array",
+                    "description": "The ingredients & associated annotations",
+                    "items": {
+                        "$ref": "#/definitions/ingredient"
+                    }
+                },
+                "steps": {
+                    "type": "array",
+                    "description": "The steps & associated annotations",
+                    "items": {
+                        "$ref": "#/definitions/step"
+                    }
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "type": "object"
+        }
+    },
+    "responses": {
+        "ParseError": {
+            "description": "When a mask can't be parsed"
+        },
+        "MaskError": {
+            "description": "When any error occurs on mask"
+        }
+    }
+}

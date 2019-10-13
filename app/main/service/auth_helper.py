@@ -66,19 +66,21 @@ class Auth:
          uname = User.decode_auth_token(auth_token)
          if isinstance(uname, str):
                user = User.query.filter_by(username=uname).first()
-               response_object = {
-                  'status': 'success',
-                  'data': {
-                     'username': user.username,
-                     'admin': user.admin,
-                     'name': user.name,
-                     'registered_on': str(user.registered_on)
+               if user != None:
+                  response_object = {
+                     'status': 'success',
+                     'data': {
+                        'username': user.username,
+                        'admin': user.admin,
+                        'name': user.name,
+                        'registered_on': str(user.registered_on)
+                     }
                   }
-               }
-               return response_object, 200
+                  return response_object, 200
+                  
          response_object = {
-               'status': 'fail',
-               'message': uname
+            'status': 'fail',
+            'message': 'Invalid auth token'
          }
          return response_object, 401
       else:
