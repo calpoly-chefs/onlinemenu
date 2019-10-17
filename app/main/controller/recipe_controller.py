@@ -4,11 +4,16 @@ from flask_restplus import Resource
 from ..util.dto import RecipeDto
 from ..service.recipe_service import *
 from ..util.decorator import token_required
+from werkzeug.datastructures import FileStorage
 
 api = RecipeDto.api
 _recipe = RecipeDto.recipe
 _recipe_short = RecipeDto.recipe_short
 _recipe_create = RecipeDto.recipe_create
+
+upload_parser = api.parser()
+upload_parser.add_argument('file', location='files',
+                           type=FileStorage, required=True)
 
 @api.route('/')
 class RecipeList(Resource):
@@ -17,7 +22,7 @@ class RecipeList(Resource):
    @token_required
    def get(self, user):
       """List all recipes"""
-      return get_all_recipes(user)
+      return get_all_recipes(user), 200
 
    @api.response(201, 'Recipe successfully created.')
    @api.doc('create a new recipe')
@@ -57,4 +62,12 @@ class RecipeSingleLike(Resource):
    @token_required
    def post(self, user, recipe_id):
       return toggle_recipe_like(user=user, recipe_id=recipe_id)
+
+@api.route('/<int:recipe_id>/images')
+class RecipeImageManager(Resource):
+   @api.doc('upload an image to a recipe')
+   @api.expect(upload_parser)
+   @token_required
+   def put(self, user, recipe_id):
+      return add_one_image(user, recipe_id, request.files['file'])
    

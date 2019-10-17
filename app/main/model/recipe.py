@@ -1,9 +1,10 @@
 from .. import db, flask_bcrypt
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm.session import object_session
 import datetime
 import jwt
 from ..config import key
+from app.main.model.user import likes
 
 #TODO remove - only for debugging
 import sys
@@ -41,7 +42,6 @@ class Recipe(db.Model):
 
    @hybrid_property
    def remix_count(self):
-      print("Remixes: {}".format(self.remixes), file=sys.stderr)
       return len(self.remixes)
    
    @remix_count.expression
@@ -54,6 +54,10 @@ class Recipe(db.Model):
    @hybrid_property
    def likes_count(self):
       return len(self.likers)
+
+   @hybrid_method
+   def has_liked(self, username):
+      return db.session.query(likes).filter(likes.c.username==username).filter(likes.c.recipe_id==self.id).first() != None
 
    @likes_count.expression
    def _likes_count_expression(cls):

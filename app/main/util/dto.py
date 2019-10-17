@@ -29,6 +29,7 @@ class RecipeDto:
       'username': fields.String,
       'remix_count': fields.Integer,
       'likes_count': fields.Integer,
+      'has_liked': fields.Boolean,
       'description': fields.String,
       'featured_image': fields.String,
       'tags': fields.List(fields.String)

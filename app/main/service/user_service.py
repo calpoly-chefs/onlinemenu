@@ -8,7 +8,7 @@ import sys
 
 
 def save_new_user(data):
-   user = User.query.filter_by(email=data['email']).first()
+   user = User.query.filter_by(username=data['username']).first()
    if not user:
       new_user = User(
          name=data['name'],
@@ -23,7 +23,7 @@ def save_new_user(data):
    else:
       response_object = {
          'status': 'fail',
-         'message': 'User already exists. Please Log in.',
+         'message': 'That username is already taken, please try a different one',
       }
       return response_object, 409
 
