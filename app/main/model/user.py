@@ -1,7 +1,7 @@
 from .. import db, flask_bcrypt
 import datetime
 import jwt
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from app.main.model.blacklist import BlacklistToken
 from ..config import key
 
@@ -50,6 +50,10 @@ class User(db.Model):
    @hybrid_property
    def total_likes(self):
       return sum(rec.likes_count for rec in self.recipes)
+
+   @hybrid_method
+   def is_following(self, username):
+      return db.session.query(user_following).filter(user_following.c.user_username==username).filter(user_following.c.following_username==self.username).first() != None
 
    @property
    def password(self):

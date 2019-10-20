@@ -1,5 +1,6 @@
 from .. import db, flask_bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm.session import object_session
 import datetime
 import jwt
@@ -32,10 +33,14 @@ class Recipe(db.Model):
    cost = db.Column(db.Float, nullable=True)
    description = db.Column(db.Text) 
    ingredients = db.relationship('Ingredient',
+      order_by='Ingredient.number',
+      collection_class=ordering_list('number', count_from=1),
       backref='recipe',
       lazy=True,
       cascade='all,delete,delete-orphan')
    steps = db.relationship('Step',
+      order_by='Step.number',
+      collection_class=ordering_list('number', count_from=1),
       backref='recipe',
       lazy=True,
       cascade='all,delete,delete-orphan')

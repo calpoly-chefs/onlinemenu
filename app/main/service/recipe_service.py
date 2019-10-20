@@ -56,6 +56,13 @@ def update_recipe(data, user, recipe_id):
          'message': 'Could not find recipe',
       }, 404
 
+   for t in data['tags']:
+      tag = Tag.query.filter_by(tagname=t).first()
+      if tag == None:
+         tag = Tag(tagname=t)
+      rec.tags.append(tag)
+
+   # TODO there might be a better way to do this (query all ingredients with recipe and match numbers???)
    for s in data['steps']:
       step = Step.query.filter_by(recipe_id=recipe_id).filter_by(number=s['number']).first()
       if 'annotation' in s:
@@ -72,8 +79,7 @@ def update_recipe(data, user, recipe_id):
          i['annotation'] = None
       db.session.add(ing)
 
-   rec.featured_image = data['featured_image'] if 'featured_image' in data else None
-   rec.images = data['images'] if 'images' in data else None
+   rec.featured_image = data['featured_image'] if 'featured_image' in data else rec.featured_image
 
    db.session.commit()
 
@@ -108,18 +114,16 @@ def save_new_recipe(data, user):
          tag = Tag(tagname=t)
       new_recipe.tags.append(tag)
 
-   for num, i in enumerate(data['ingredients'], start=1):
+   for i in data['ingredients']:
       new_recipe.ingredients.append(Ingredient(
          text=i['text'], 
-         annotation=i['annotation'] if 'annotation' in i else None,
-         number=num
+         annotation=i['annotation'] if 'annotation' in i else None
       ))
 
-   for num, s in enumerate(data['steps'], start=1):
+   for s in data['steps']:
       new_recipe.steps.append(Step(
          text=s['text'],
-         annotation=s['annotation'] if 'annotation' in s else None,
-         number=num
+         annotation=s['annotation'] if 'annotation' in s else None
       ))
 
 
@@ -167,13 +171,13 @@ def get_all_recipes(user):
 def get_one_recipe(user, recipe_id):
    rec = Recipe.query.filter_by(id=recipe_id).first()
 
-   rec.__dict__['has_liked'] = rec.has_liked(user)
-
    if (rec is None):
       return {
          'status': 'fail',
          'message': 'recipe not found'
       }, 404
+
+   rec.__dict__['has_liked'] = rec.has_liked(user)
 
    return rec
 

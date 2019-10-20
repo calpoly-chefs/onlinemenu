@@ -8,6 +8,7 @@ class AuthDto:
       'password': fields.String(required=True, description='The user password'),
    })
 
+
 class RecipeDto:
    api = Namespace('recipe', description='Recipe related operations')
    ingredient_fields = api.model('ingredient', {
@@ -108,6 +109,7 @@ class UserDto:
       'following_count': fields.Integer(),
       'total_likes': fields.Integer(),
       'badges': fields.String(),
+      'is_following': fields.Boolean
    })
 
    user_self = api.model('user_self', {
@@ -159,4 +161,27 @@ class UserDto:
          fields.Nested(RecipeDto.recipe_short),
          required=False,
          description="All of a User's Recipes, in short form"),
+   })
+
+class SearchDto:
+   api = Namespace('search', description='search related operations')
+   search_tag = api.model('search_tag', {
+      'tagname': fields.String,
+      'recipe_count': fields.Integer
+   })
+   search_all = api.model('search_all', {
+      'recipes': fields.List(
+         fields.Nested(RecipeDto.recipe_short),
+         required=False,
+         description="All matching Recipes, in short form"),
+      'users': fields.List(
+         fields.Nested(UserDto.user_short),
+         required=False,
+         description="All matching users, in short form"
+      ),
+      'tags': fields.List(
+         fields.Nested(search_tag),
+         required=False,
+         description="All matching tags, as strings"
+      )
    })
