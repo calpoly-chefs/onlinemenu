@@ -109,7 +109,7 @@ class UserDto:
       'following_count': fields.Integer(),
       'total_likes': fields.Integer(),
       'badges': fields.String(),
-      'is_following': fields.Boolean
+      'is_following': fields.Boolean(required=False)
    })
 
    user_self = api.model('user_self', {

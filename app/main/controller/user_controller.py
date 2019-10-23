@@ -15,9 +15,10 @@ _user_detail = UserDto.user_detail
 class UserList(Resource):
     @api.doc('list_of_registered_users')
     @api.marshal_list_with(_user_short, envelope='data')
-    def get(self):
+    @token_required
+    def get(self, user):
         """List all registered users"""
-        return get_all_users()
+        return get_all_users(user=user)
 
     @api.response(201, 'User successfully created.')
     @api.doc('create a new User')

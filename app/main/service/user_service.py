@@ -66,8 +66,12 @@ def generate_token(user):
       }
       return response_object, 401
       
-def get_all_users():
-   return User.query.all()
+def get_all_users(user):
+   users =  User.query.all()
+   for usr in users:
+      usr.__dict__['is_following'] = usr.is_following(user)
+   
+   return users
 
 
 def get_a_user(user, other_user):
