@@ -112,14 +112,10 @@ class UserDto:
       'is_following': fields.Boolean(required=False)
    })
 
-   user_self = api.model('user_self', {
+   user_self = api.clone('user_self', user_short, {
       'email': fields.String(required=True, description='user email address'),
-      'username': fields.String(required=True, description='user username'),
       'name': fields.String(description='users name'),
       'bio': fields.String(),
-      'recipe_count': fields.Integer(),
-      'total_likes': fields.Integer(),
-      'badges': fields.String(),
       'following': fields.List(
          fields.Nested(user_short),
          required=False,
@@ -144,15 +140,10 @@ class UserDto:
       'bio': fields.String(description="users bio")
    })
 
-   user_detail = api.model('user_detail', {
+   user_detail = api.clone('user_detail', user_short, {
       'email': fields.String(required=True, description='user email address'),
-      'username': fields.String(required=True, description='user username'),
-      'name': fields.String(description='users name'),
       'bio': fields.String(),
-      'recipe_count': fields.Integer(),
       'total_likes': fields.Integer(),
-      'badges': fields.String(),
-      'is_following': fields.Boolean(),
       'following': fields.List(
          fields.Nested(user_short),
          required=False,

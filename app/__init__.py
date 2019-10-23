@@ -14,7 +14,7 @@ authorizations = {
     'Bearer Auth': {
         'type': 'apiKey',
         'in': 'header',
-        'name': 'Authorization'
+        'name': 'authorization'
     },
 }
 
@@ -22,7 +22,8 @@ api = Api(blueprint,
           title='littleChef back end',
           version='0.1',
           description='The REST API running the tinyWaiter',
-          authorizations=authorizations
+          authorizations=authorizations,
+          security='Bearer Auth'
           )
 
 api.add_namespace(user_ns, path='/users')
