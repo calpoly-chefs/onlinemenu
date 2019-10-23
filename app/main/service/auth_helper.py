@@ -62,8 +62,11 @@ class Auth:
    def get_logged_in_user(new_request):
       # get the auth token
       auth_token = new_request.headers.get('Authorization')
+      print('JWT: {}'.format(auth_token), file=sys.stderr)
+      print(dict(new_request.headers), sys.stderr)
       if auth_token:
          uname = User.decode_auth_token(auth_token)
+         print('uname: {}'.format(uname), file=sys.stderr)
          if isinstance(uname, str):
                user = User.query.filter_by(username=uname).first()
                if user != None:
