@@ -16,7 +16,7 @@ class Auth:
                   response_object = {
                      'status': 'success',
                      'message': 'Successfully logged in.',
-                     'Authorization': auth_token.decode()
+                     'authorization': auth_token.decode()
                   }
                   return response_object, 200
          else:
@@ -61,7 +61,7 @@ class Auth:
    @staticmethod
    def get_logged_in_user(new_request):
       # get the auth token
-      auth_token = new_request.headers.get('Authorization')
+      auth_token = new_request.headers.get('authorization')
       print('JWT: {}'.format(auth_token), file=sys.stderr)
       print(dict(new_request.headers), sys.stderr)
       if auth_token:
