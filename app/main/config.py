@@ -2,7 +2,6 @@ import os
 
 # uncomment the line below for postgres database url from environment variable
 postgres_prod_base = os.environ['DATABASE_URL']
-postgres_local_base = os.environ['DEV_DATABASE_URL']
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -13,7 +12,7 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = postgres_local_base
+    SQLALCHEMY_DATABASE_URI = os.environ['DEV_DATABASE_URL']
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
