@@ -1,10 +1,10 @@
-from .. import db, flask_bcrypt
+from app.main import db, flask_bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm.session import object_session
 import datetime
 import jwt
-from ..config import key
+from app.main.config import key
 from app.main.model.user import likes
 
 #TODO remove - only for debugging
@@ -31,7 +31,7 @@ class Recipe(db.Model):
    source = db.Column(db.String(255), nullable=False)
    calories = db.Column(db.Integer, nullable=True)
    cost = db.Column(db.Float, nullable=True)
-   description = db.Column(db.Text) 
+   description = db.Column(db.Text)
    ingredients = db.relationship('Ingredient',
       order_by='Ingredient.number',
       collection_class=ordering_list('number', count_from=1),

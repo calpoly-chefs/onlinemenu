@@ -30,7 +30,7 @@ class RecipeDto:
       'username': fields.String,
       'remix_count': fields.Integer,
       'likes_count': fields.Integer,
-      'has_liked': fields.Boolean,
+      'has_liked': fields.Boolean(default=False, required=False),
       'description': fields.String,
       'featured_image': fields.String,
       'tags': fields.List(fields.String)
@@ -39,11 +39,9 @@ class RecipeDto:
    recipe_create = api.model('recipe_create', {
       'title': fields.String,
       'parent_id': fields.Integer,
-      'id': fields.Integer,
       'cooktime': fields.String,
       'preptime': fields.String,
       'totaltime': fields.String,
-      'username': fields.String,
       'public': fields.Boolean,
       'servings': fields.String,
       'source': fields.String,
@@ -51,8 +49,6 @@ class RecipeDto:
       'cost': fields.Integer,
       'difficulty': fields.Integer,
       'description': fields.String,
-      'featured_image': fields.String,
-      'images': fields.List(fields.String),
       'ingredients': fields.List(
          fields.Nested(ingredient_fields),
          required=True,
@@ -154,6 +150,7 @@ class UserDto:
          description="All of a User's Recipes, in short form"),
    })
 
+
 class SearchDto:
    api = Namespace('search', description='search related operations')
    search_tag = api.model('search_tag', {
@@ -175,4 +172,26 @@ class SearchDto:
          required=False,
          description="All matching tags, as strings"
       )
+   })
+   search_recipe = api.model('search_recipe', {
+      'recipes': fields.List(
+         fields.Nested(RecipeDto.recipe_short)
+      )
+   })
+
+
+class ChallengeDTO:
+   api = Namespace('callenge', description='challenges')
+   challenge_short = api.model('challenge_short', {
+      'recipe': fields.Nested(RecipeDto.recipe),
+      'top_three': fields.List(
+         fields.Nested(RecipeDto.recipe_short)
+      )
+   })
+   challenge_create = api.model('challenge_create', {
+      'ingredients': fields.List(
+         fields.Nested(RecipeDto.ingredient_fields),
+         required=True,
+         description='The required ingredients for the challenge'),
+      'title': fields.String
    })

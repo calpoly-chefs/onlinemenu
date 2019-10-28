@@ -1,9 +1,9 @@
-import uuid
-import datetime
 import boto3
 import os
+import datetime
 
 from app.main import db
+from app.main.config import Config
 from app.main.model.recipe import Recipe, Step, Ingredient
 from app.main.model.tag import Tag
 from app.main.model.user import User, likes
@@ -13,6 +13,7 @@ import sys
 
 
 def add_one_image(user, recipe_id, img):
+
    rec = Recipe.query.filter_by(id=recipe_id).first()
    if rec is None or rec.username != user:
       return {
@@ -36,6 +37,7 @@ def add_one_image(user, recipe_id, img):
    imgs = []
    if rec.images != None:
       imgs = rec.images.copy()
+   img_name = "{}/{}".format(Config.CDN_URL, img_name)
    imgs.append(img_name)
    rec.images = imgs
 
@@ -44,7 +46,8 @@ def add_one_image(user, recipe_id, img):
 
    return {
       'status': 'success',
-      'message': 'Image successfully uploaded'
+      'message': 'Image successfully uploaded',
+      'url': img_name
    }
    
 
@@ -94,8 +97,6 @@ def save_new_recipe(data, user):
       title=data['title'],
       parent_id=data['parent_id'] if 'parent_id' in data and Recipe.query.filter_by(id=data['parent_id']).first != None else None,
       created_on=datetime.datetime.utcnow(),
-      images=data['images'] if 'images' in data else None,
-      featured_image=data['featured_image'] if 'featured_image' in data else None,
       cooktime=data['cooktime'],
       preptime=data['preptime'],
       totaltime=data['totaltime'],
@@ -136,7 +137,8 @@ def save_new_recipe(data, user):
 
    response_object = {
       'status': 'success',
-      'message': 'Recipe successfully created.'
+      'message': 'Recipe successfully created.',
+      'id': new_recipe.id
    }
    return response_object, 201
 

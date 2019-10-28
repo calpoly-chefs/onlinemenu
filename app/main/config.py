@@ -1,12 +1,14 @@
 import os
 
 # uncomment the line below for postgres database url from environment variable
-postgres_local_base = os.environ['DATABASE_URL']
+postgres_prod_base = os.environ['DATABASE_URL']
+postgres_local_base = os.environ['DEV_DATABASE_URL']
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
+    CDN_URL = 'd22cps7bw4wnz9.cloudfront.net'
     DEBUG = False
 
 
@@ -26,7 +28,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = postgres_local_base
+    SQLALCHEMY_DATABASE_URI = postgres_prod_base
 
 
 config_by_name = dict(

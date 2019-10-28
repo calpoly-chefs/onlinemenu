@@ -13,7 +13,7 @@ from app.main.model import blacklist
 from app.main.model import recipe
 from app.main.model import tag
 
-application = app = create_app('prod')
+application = app = create_app('dev')
 app.register_blueprint(blueprint)
 
 app.app_context().push()

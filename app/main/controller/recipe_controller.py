@@ -1,9 +1,9 @@
 from flask import request
 from flask_restplus import Resource
 
-from ..util.dto import RecipeDto
-from ..service.recipe_service import *
-from ..util.decorator import token_required
+from app.main.util.dto import RecipeDto
+from app.main.service.recipe_service import *
+from app.main.util.decorator import token_required
 from werkzeug.datastructures import FileStorage
 
 api = RecipeDto.api

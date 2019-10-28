@@ -1,9 +1,9 @@
 from flask import request
 from flask_restplus import Resource
 
-from ..util.dto import UserDto
-from ..service.user_service import *
-from ..util.decorator import token_required
+from app.main.util.dto import UserDto
+from app.main.service.user_service import *
+from app.main.util.decorator import token_required
 
 api = UserDto.api
 _user_short = UserDto.user_short
