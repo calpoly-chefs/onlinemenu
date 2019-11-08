@@ -32,7 +32,7 @@ class RecipeDto:
       'likes_count': fields.Integer,
       'description': fields.String,
       'featured_image': fields.String,
-      'has_liked': fields.Boolean(default=False, required=False),
+      'liked': fields.Boolean(default=False, required=False),
       'tags': fields.List(fields.String)
    })
 
@@ -76,7 +76,7 @@ class RecipeDto:
       'cost': fields.Integer,
       'difficulty': fields.Integer,
       'likes_count': fields.Integer,
-      'has_liked': fields.Boolean(default=False, required=False),
+      'liked': fields.Boolean(default=False, required=False),
       'description': fields.String,
       'featured_image': fields.String,
       'images': fields.List(fields.String),

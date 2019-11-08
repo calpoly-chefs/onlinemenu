@@ -16,7 +16,7 @@ def search_recipes(s, user):
     all_recs = Recipe.query.filter(or_(Recipe.title.ilike(search), Ingredient.text.ilike(search))).limit(10).all()
 
     for rec in all_recs:
-        rec.__dict__["has_liked"] = rec.has_liked(user)
+        rec.__dict__["liked"] = rec.has_liked(user)
 
     return all_recs
 

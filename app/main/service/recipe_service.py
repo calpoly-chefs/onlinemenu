@@ -166,7 +166,7 @@ def get_all_recipes(user):
    recs = Recipe.query.all()
    
    for rec in recs:
-      rec.__dict__['has_liked'] = rec.has_liked(user)
+      rec.__dict__['liked'] = rec.has_liked(user)
 
    return recs
 
@@ -179,7 +179,7 @@ def get_one_recipe(user, recipe_id):
          'message': 'recipe not found'
       }, 404
 
-   rec.__dict__['has_liked'] = rec.has_liked(user)
+   rec.__dict__['liked'] = rec.has_liked(user)
 
    return rec
 

@@ -61,11 +61,7 @@ class Recipe(db.Model):
       return len(self.likers)
 
    @hybrid_method
-   def has_liked(self, username=""):
-      print("USERNAME: {}".format(username), file=sys.stderr)
-      if(username == ""):
-         return False
-      
+   def has_liked(self, username):
       return db.session.query(likes).filter(likes.c.username==username).filter(likes.c.recipe_id==self.id).first() != None
 
    @likes_count.expression
