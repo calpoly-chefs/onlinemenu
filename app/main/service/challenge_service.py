@@ -10,10 +10,10 @@ def get_current_challenge(user):
 
     chal = Challenge.query.filter(Challenge.end_date >= now).first()
 
-    chal.recipe.__dict__['has_liked'] = False
+    chal.recipe.__dict__['liked'] = False
 
     for r in chal.top_three:
-        r.__dict__['has_liked'] = r.has_liked(user)
+        r.__dict__['liked'] = r.has_liked(user)
 
     return chal
 

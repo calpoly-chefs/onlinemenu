@@ -79,6 +79,8 @@ def get_a_user(user, other_user):
 
    user_dict = _other_user.__dict__
    user_dict['is_following'] = _other_user.is_following(user)
+   for r in _other_user.recipes:
+      r.__dict__['liked'] = r.has_liked(user)
 
    return _other_user
 

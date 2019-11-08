@@ -53,7 +53,10 @@ class User(db.Model):
 
    @hybrid_method
    def is_following(self, username):
-      return db.session.query(user_following).filter(user_following.c.user_username==username).filter(user_following.c.following_username==self.username).first() != None
+      return (db.session.query(user_following)
+               .filter(user_following.c.user_username==username)
+               .filter(user_following.c.following_username==self.username)
+               .first() != None)
 
    @property
    def password(self):

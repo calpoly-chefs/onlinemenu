@@ -60,6 +60,7 @@ class Recipe(db.Model):
    def likes_count(self):
       return len(self.likers)
 
+   #TODO make has_liked work when nested, as in viewing other user's recipes
    @hybrid_method
    def has_liked(self, username):
       return db.session.query(likes).filter(likes.c.username==username).filter(likes.c.recipe_id==self.id).first() != None
