@@ -30,10 +30,13 @@ class RecipeDto:
       'username': fields.String,
       'remix_count': fields.Integer,
       'likes_count': fields.Integer,
-      'has_liked': fields.Boolean(default=False, required=False),
       'description': fields.String,
       'featured_image': fields.String,
       'tags': fields.List(fields.String)
+   })
+   
+   recipe_search = api.clone(recipe_short, {
+      'has_liked': fields.Boolean(default=False, required=False),
    })
 
    recipe_create = api.model('recipe_create', {
@@ -76,7 +79,7 @@ class RecipeDto:
       'cost': fields.Integer,
       'difficulty': fields.Integer,
       'likes_count': fields.Integer,
-      'has_liked': fields.Boolean,
+      'has_liked': fields.Boolean(default=False, required=False),
       'description': fields.String,
       'featured_image': fields.String,
       'images': fields.List(fields.String),
