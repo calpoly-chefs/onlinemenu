@@ -77,12 +77,14 @@ def get_all_users(user):
 def get_a_user(user, other_user):
    _user = User.query.filter_by(username=other_user).first()
 
+   user_dict = _user.__dict__
    # add 'is_following' field if user is not other user
    if user != other_user:
-      user_dict = _user.__dict__
       user_dict['is_following'] = (db.session.query(user_following)
                   .filter(user_following.c.user_username==user)
                   .filter(user_following.c.following_username==other_user).first() != None)
+   else:
+      user_dict['is_following'] = False
 
 
    return _user

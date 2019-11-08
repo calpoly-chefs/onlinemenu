@@ -41,5 +41,11 @@ def test():
       return 0
    return 1
 
+@app.teardown_request
+def teardown_request(exception):
+    if exception:
+        db.session.rollback()
+    db.session.remove()
+
 if __name__ == '__main__':
    manager.run()
