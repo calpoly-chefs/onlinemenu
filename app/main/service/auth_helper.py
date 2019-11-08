@@ -10,6 +10,7 @@ class Auth:
       try:
          # fetch the user data
          user = User.query.filter_by(username=data.get('username')).first()
+         print("AUTH ATTEMPT:\n\tuname: {}\n\tpass: {}\n\tmatch: {}".format(data.get('username'), data.get('password'), user.check_password(data.get('password')), file=sys.stderr)
          if user and user.check_password(data.get('password')):
                auth_token = user.encode_auth_token(user.username)
                if auth_token:
