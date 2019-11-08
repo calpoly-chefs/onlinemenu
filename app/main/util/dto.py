@@ -32,11 +32,8 @@ class RecipeDto:
       'likes_count': fields.Integer,
       'description': fields.String,
       'featured_image': fields.String,
-      'tags': fields.List(fields.String)
-   })
-   
-   recipe_search = api.clone('recipe_short', {
       'has_liked': fields.Boolean(default=False, required=False),
+      'tags': fields.List(fields.String)
    })
 
    recipe_create = api.model('recipe_create', {
