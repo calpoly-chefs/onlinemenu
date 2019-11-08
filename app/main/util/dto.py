@@ -35,7 +35,7 @@ class RecipeDto:
       'tags': fields.List(fields.String)
    })
    
-   recipe_search = api.clone(recipe_short, {
+   recipe_search = api.clone('recipe_short', {
       'has_liked': fields.Boolean(default=False, required=False),
    })
 
