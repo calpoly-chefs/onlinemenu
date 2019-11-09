@@ -102,11 +102,12 @@ def save_new_recipe(data, user):
       totaltime=data['totaltime'],
       username=user,
       public=data['public'],
-      servings=data['servings'],
+      servings=data['servings'] if 'servings' in data else None,
       source=data['source'],
-      calories=data['calories'],
-      cost=data['cost'],
-      description=data['description'],
+      calories=data['calories'] if 'calories' in data else None,
+      cost=data['cost'] if 'cost' in data else None,
+      difficulty=data['difficulty'] if 'difficulty' in data else None,
+      description=data['description']
    )
 
    for t in data['tags']:

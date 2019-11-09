@@ -37,18 +37,18 @@ class RecipeDto:
    })
 
    recipe_create = api.model('recipe_create', {
-      'title': fields.String,
+      'title': fields.String(required=True),
       'parent_id': fields.Integer(nullable=True),
-      'cooktime': fields.String,
-      'preptime': fields.String,
-      'totaltime': fields.String,
-      'public': fields.Boolean,
-      'servings': fields.String,
-      'source': fields.String,
+      'cooktime': fields.String(required=True),
+      'preptime': fields.String(required=True),
+      'totaltime': fields.String(required=True),
+      'public': fields.Boolean(required=True),
+      'servings': fields.String(nullable=True),
+      'source': fields.String(required=True),
       'calories': fields.Integer,
       'cost': fields.Integer,
       'difficulty': fields.Integer,
-      'description': fields.String,
+      'description': fields.String(required=True),
       'ingredients': fields.List(
          fields.Nested(ingredient_fields),
          required=True,
@@ -57,7 +57,9 @@ class RecipeDto:
          fields.Nested(step_fields),
          required=True,
          description='The steps & associated annotations'),
-      'tags': fields.List(fields.String)
+      'tags': fields.List(fields.String,
+         required=True,
+         description='Tags associated with this recipe')
    })
 
    recipe = api.model('recipe', {
@@ -130,8 +132,8 @@ class UserDto:
       'email': fields.String(required=True, description='user email address'),
       'username': fields.String(required=True, description='user username'),
       'password': fields.String(required=True, description='user password'),
-      'name': fields.String(description='users name'),
-      'bio': fields.String(description="users bio")
+      'name': fields.String(required=True, description='users name'),
+      'bio': fields.String(required=True, description="users bio")
    })
 
    user_detail = api.clone('user_detail', user_short, {
@@ -191,5 +193,5 @@ class ChallengeDTO:
          fields.Nested(RecipeDto.ingredient_fields),
          required=True,
          description='The required ingredients for the challenge'),
-      'title': fields.String
+      'title': fields.String(required=True)
    })
