@@ -37,18 +37,18 @@ class RecipeDto:
    })
 
    recipe_create = api.model('recipe_create', {
-      'title': fields.String(required=True),
+      'title': fields.String(nullable=True),
       'parent_id': fields.Integer(nullable=True),
-      'cooktime': fields.String(required=True),
-      'preptime': fields.String(required=True),
-      'totaltime': fields.String(required=True),
-      'public': fields.Boolean(required=True),
+      'cooktime': fields.String(nullable=True),
+      'preptime': fields.String(nullable=True),
+      'totaltime': fields.String(nullable=True),
+      'public': fields.Boolean(nullable=True),
       'servings': fields.String(nullable=True),
       'source': fields.String(required=True),
       'calories': fields.Integer,
       'cost': fields.Integer,
       'difficulty': fields.Integer,
-      'description': fields.String(required=True),
+      'description': fields.String(nullable=True),
       'ingredients': fields.List(
          fields.Nested(ingredient_fields),
          required=True,
@@ -58,7 +58,7 @@ class RecipeDto:
          required=True,
          description='The steps & associated annotations'),
       'tags': fields.List(fields.String,
-         required=True,
+         nullable=True,
          description='Tags associated with this recipe')
    })
 

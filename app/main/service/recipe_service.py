@@ -53,36 +53,70 @@ def add_one_image(user, recipe_id, img):
 
 def update_recipe(data, user, recipe_id):
    rec = Recipe.query.filter_by(id=recipe_id).first()
+
+   #Make sure rec exists and is owned by user
    if rec is None or rec.username != user:
       return {
          'status': 'fail',
          'message': 'Could not find recipe',
       }, 404
 
+   #update rec fields if given
+   rec.title = data['title'] if 'title' in data else rec.title
+   rec.cooktime = data['cooktime'] if 'cooktime' in data else rec.cooktime
+   rec.preptime = data['preptime'] if 'preptime' in data else rec.preptime
+   rec.totaltime = data['totaltime'] if 'totaltime' in data else rec.totaltime
+   rec.featured_image = data['featured_image'] if 'featured_image' in data else rec.featured_image
+   rec.description = data['description'] if 'description' in data else rec.description
+   rec.difficulty = data['difficulty'] if 'difficulty' in data else rec.difficulty
+   rec.public = data['public'] if 'public' in data else rec.public
+   rec.calories = data['calories'] if 'calories' in data else rec.calories
+   rec.cost = data['cost'] if 'cost' in data else rec.cost
+
+
+
+   #set recipe's tags to only those in request (add/remove tags)
+   rec.tags = []
    for t in data['tags']:
       tag = Tag.query.filter_by(tagname=t).first()
       if tag == None:
          tag = Tag(tagname=t)
       rec.tags.append(tag)
 
-   # TODO there might be a better way to do this (query all ingredients with recipe and match numbers???)
    for s in data['steps']:
       step = Step.query.filter_by(recipe_id=recipe_id).filter_by(number=s['number']).first()
-      if 'annotation' in s:
-         step.annotation = s['annotation']
+      
+      #create step if it does not exist
+      if not step:
+         step = Step(
+            text=s['text'],
+            annotation=s['annotation'] if 'annotation' in s else None)
+         rec.steps.append(step)
+
+      #step already exists, update it's annotation
       else:
-         step.annotation = None
+         if 'annotation' in s:
+            step.annotation = s['annotation']
+         else:
+            step.annotation = None
       db.session.add(step)
 
    for i in data['ingredients']:
       ing = Ingredient.query.filter_by(recipe_id=recipe_id).filter_by(number=i['number']).first()
-      if 'annotation' in i:
-         ing.annotation = i['annotation']
-      else:
-         i['annotation'] = None
-      db.session.add(ing)
+      #create ingredient if it did not yet exist
+      if not ing:
+         ing = Ingredient(
+            text=i['text'],
+            annotation=i['annotation'] if 'annotation' in i else None)
+         rec.ingredients.append(ing)
 
-   rec.featured_image = data['featured_image'] if 'featured_image' in data else rec.featured_image
+      #ingredient already exists, update it's annotation
+      else:
+         if 'annotation' in i:
+            ing.annotation = i['annotation']
+         else:
+            i['annotation'] = None
+      db.session.add(ing)
 
    db.session.commit()
 
@@ -94,20 +128,20 @@ def update_recipe(data, user, recipe_id):
 
 def save_new_recipe(data, user):
    new_recipe = Recipe(
-      title=data['title'],
+      title=data['title'] if 'title' in data else "None",
       parent_id=data['parent_id'] if 'parent_id' in data and Recipe.query.filter_by(id=data['parent_id']).first != None else None,
       created_on=datetime.datetime.utcnow(),
-      cooktime=data['cooktime'],
-      preptime=data['preptime'],
-      totaltime=data['totaltime'],
+      cooktime=data['cooktime'] if 'cooktime' in data else "None",
+      preptime=data['preptime'] if 'preptime' in data else "None",
+      totaltime=data['totaltime'] if 'totaltime' in data else "None",
       username=user,
-      public=data['public'],
-      servings=data['servings'] if 'servings' in data else None,
+      public=data['public'] if 'public' in data else True,
+      servings=data['servings'] if 'servings' in data else "None",
       source=data['source'],
       calories=data['calories'] if 'calories' in data else None,
       cost=data['cost'] if 'cost' in data else None,
       difficulty=data['difficulty'] if 'difficulty' in data else None,
-      description=data['description']
+      description=data['description'] if 'description' in data else None
    )
 
    for t in data['tags']:
