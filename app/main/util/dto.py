@@ -13,13 +13,13 @@ class RecipeDto:
    api = Namespace('recipe', description='Recipe related operations')
    ingredient_fields = api.model('ingredient', {
       'text': fields.String,
-      'annotation': fields.String(required=False),
+      'annotation': fields.String(required=False, nullable=True, default=""),
       'number': fields.Integer
    })
 
    step_fields = api.model('step', {
       'text': fields.String,
-      'annotation': fields.String(required=False),
+      'annotation': fields.String(required=False, nullable=True, default=""),
       'number': fields.Integer
    })
 
@@ -38,7 +38,7 @@ class RecipeDto:
 
    recipe_create = api.model('recipe_create', {
       'title': fields.String,
-      'parent_id': fields.Integer,
+      'parent_id': fields.Integer(nullable=True),
       'cooktime': fields.String,
       'preptime': fields.String,
       'totaltime': fields.String,
@@ -110,7 +110,6 @@ class UserDto:
 
    user_self = api.clone('user_self', user_short, {
       'email': fields.String(required=True, description='user email address'),
-      'name': fields.String(description='users name'),
       'bio': fields.String(),
       'following': fields.List(
          fields.Nested(user_short),
@@ -124,7 +123,6 @@ class UserDto:
          fields.Nested(RecipeDto.recipe_short),
          required=False,
          description="All of a User's Recipes, in short form"),
-      'following_count': fields.String(),
       'follower_count': fields.String(),
    })
 

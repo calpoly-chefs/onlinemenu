@@ -39,7 +39,7 @@ class RecipeList(Resource):
 class RecipeSingle(Resource):
    @api.doc('update a recipe\'s annotations')
    @token_required
-   @api.expect(_recipe_create, validate=True)
+   @api.expect(_recipe_create, validate=False)
    def put(self, user, recipe_id):
       """Updates an existing recipe"""
       data = request.json

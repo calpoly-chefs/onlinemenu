@@ -5,6 +5,7 @@ from app.main.model.user import User, user_following
 
 #TODO remove sys import, was for testing
 import sys
+import pprint
 
 
 def save_new_user(data):
@@ -75,12 +76,19 @@ def get_all_users(user):
 
 
 def get_a_user(user, other_user):
+   pp = pprint.PrettyPrinter(indent=4)
    _other_user = User.query.filter_by(username=other_user).first()
-
    user_dict = _other_user.__dict__
+   print(pp.pformat(user_dict), file=sys.stderr)
    user_dict['is_following'] = _other_user.is_following(user)
+   
    for r in _other_user.recipes:
       r.__dict__['liked'] = r.has_liked(user)
+   
+   for u in _other_user.following:
+      u.__dict__['is_following'] = u.is_following(user)
+
+   print(pp.pformat(user_dict), file=sys.stderr)
 
    return _other_user
 
