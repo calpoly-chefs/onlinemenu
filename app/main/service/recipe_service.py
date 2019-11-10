@@ -34,11 +34,10 @@ def add_one_image(user, recipe_id, img):
                       Key=img_name,
                       ContentType='image/png')
 
-   # workaround to add image to array
    img_name = "{}/{}".format(Config.CDN_URL, img_name)
    img = Image(url=img_name, username=user)
    rec.images.append(img)
-   
+
    db.session.add(img)
    db.session.add(rec)
    db.session.commit()
@@ -73,49 +72,53 @@ def update_recipe(data, user, recipe_id):
    rec.cost = data['cost'] if 'cost' in data else rec.cost
 
 
+   if 'tags' in data:
+      #set recipe's tags to only those in request (add/remove tags)
+      rec.tags = []
+      for t in data['tags']:
+         tag = Tag.query.filter_by(tagname=t).first()
+         if tag == None:
+            tag = Tag(tagname=t)
+         rec.tags.append(tag)
 
-   #set recipe's tags to only those in request (add/remove tags)
-   rec.tags = []
-   for t in data['tags']:
-      tag = Tag.query.filter_by(tagname=t).first()
-      if tag == None:
-         tag = Tag(tagname=t)
-      rec.tags.append(tag)
+   if 'steps' in data:
+      for num, s in enumerate(data['steps'], start=1):
+         step = Step.query.filter_by(recipe_id=recipe_id).filter_by(number=num).first()
+         
+         #create step if it does not exist
+         if not step:
+            step = Step(
+               text=s['text'],
+               annotation=s['annotation'] if 'annotation' in s else None)
+            rec.steps.append(step)
 
-   for s in data['steps']:
-      step = Step.query.filter_by(recipe_id=recipe_id).filter_by(number=s['number']).first()
-      
-      #create step if it does not exist
-      if not step:
-         step = Step(
-            text=s['text'],
-            annotation=s['annotation'] if 'annotation' in s else None)
-         rec.steps.append(step)
-
-      #step already exists, update it's annotation
-      else:
-         if 'annotation' in s:
-            step.annotation = s['annotation']
+         #step already exists, update it's annotation
          else:
-            step.annotation = None
-      db.session.add(step)
+            step.text = s['text']
+            if 'annotation' in s:
+               step.annotation = s['annotation']
+            else:
+               step.annotation = None
+         db.session.add(step)
 
-   for i in data['ingredients']:
-      ing = Ingredient.query.filter_by(recipe_id=recipe_id).filter_by(number=i['number']).first()
-      #create ingredient if it did not yet exist
-      if not ing:
-         ing = Ingredient(
-            text=i['text'],
-            annotation=i['annotation'] if 'annotation' in i else None)
-         rec.ingredients.append(ing)
+   if 'ingredients' in data:
+      for num, i in enumerate(data['ingredients'], start=1):
+         ing = Ingredient.query.filter_by(recipe_id=recipe_id).filter_by(number=num).first()
+         #create ingredient if it did not yet exist
+         if not ing:
+            ing = Ingredient(
+               text=i['text'],
+               annotation=i['annotation'] if 'annotation' in i else None)
+            rec.ingredients.append(ing)
 
-      #ingredient already exists, update it's annotation
-      else:
-         if 'annotation' in i:
-            ing.annotation = i['annotation']
+         #ingredient already exists, update it's annotation
          else:
-            i['annotation'] = None
-      db.session.add(ing)
+            ing.text = i['text']
+            if 'annotation' in i:
+               ing.annotation = i['annotation']
+            else:
+               i['annotation'] = None
+         db.session.add(ing)
 
    db.session.commit()
 
@@ -126,6 +129,7 @@ def update_recipe(data, user, recipe_id):
 
 
 def save_new_recipe(data, user):
+
    new_recipe = Recipe(
       title=data['title'] if 'title' in data else "None",
       parent_id=data['parent_id'] if 'parent_id' in data and Recipe.query.filter_by(id=data['parent_id']).first != None else None,
@@ -136,30 +140,32 @@ def save_new_recipe(data, user):
       username=user,
       public=data['public'] if 'public' in data else True,
       servings=data['servings'] if 'servings' in data else "None",
-      source=data['source'],
+      source=data['source'] if 'source' in data else 'None',
       calories=data['calories'] if 'calories' in data else None,
       cost=data['cost'] if 'cost' in data else None,
       difficulty=data['difficulty'] if 'difficulty' in data else None,
       description=data['description'] if 'description' in data else None
    )
+   if 'tags' in data:
+      for t in data['tags']:
+         tag = Tag.query.filter_by(tagname=t).first()
+         if tag == None:
+            tag = Tag(tagname=t)
+         new_recipe.tags.append(tag)
 
-   for t in data['tags']:
-      tag = Tag.query.filter_by(tagname=t).first()
-      if tag == None:
-         tag = Tag(tagname=t)
-      new_recipe.tags.append(tag)
+   if 'ingredients' in data:
+      for i in data['ingredients']:
+         new_recipe.ingredients.append(Ingredient(
+            text=i['text'], 
+            annotation=i['annotation'] if 'annotation' in i else None
+         ))
 
-   for i in data['ingredients']:
-      new_recipe.ingredients.append(Ingredient(
-         text=i['text'], 
-         annotation=i['annotation'] if 'annotation' in i else None
-      ))
-
-   for s in data['steps']:
-      new_recipe.steps.append(Step(
-         text=s['text'],
-         annotation=s['annotation'] if 'annotation' in s else None
-      ))
+   if 'steps' in data:
+      for s in data['steps']:
+         new_recipe.steps.append(Step(
+            text=s['text'],
+            annotation=s['annotation'] if 'annotation' in s else None
+         ))
 
 
    db.session.add(new_recipe)

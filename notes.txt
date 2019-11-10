@@ -1,2 +1,7 @@
-[]  Ingredients/steps cannot be altered execpt by annotations after creation (but more can be added)
-[]  
+[3]  Change ingredient/step text on put request
+[ ]  lack of signed url is a possible vulnerability to access non public recipes
+[5]  Author (source) column, default to username if null (restrict to usernames)
+[X]  Accept totally null recipe for stub creation, and put with ingredients & steps but no tags
+[X]  Avoid requiring number for put request for ingredients/steps (will need full steps/ingredients array)
+[4]  Set first image that gets added to featured image
+[ ]  Look into way to send image as form-data with React Native, also access cropped images locally to upload (imagestore - deprecated expo file explorer)

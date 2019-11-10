@@ -14,13 +14,11 @@ class RecipeDto:
    ingredient_fields = api.model('ingredient', {
       'text': fields.String,
       'annotation': fields.String(required=False, nullable=True, default=""),
-      'number': fields.Integer
    })
 
    step_fields = api.model('step', {
       'text': fields.String,
       'annotation': fields.String(required=False, nullable=True, default=""),
-      'number': fields.Integer
    })
 
    image_metadata = api.model('image_metadata', {
@@ -52,21 +50,18 @@ class RecipeDto:
       'totaltime': fields.String(nullable=True),
       'public': fields.Boolean(nullable=True),
       'servings': fields.String(nullable=True),
-      'source': fields.String(required=True),
+      'source': fields.String(),
       'calories': fields.Integer,
       'cost': fields.Integer,
       'difficulty': fields.Integer,
       'description': fields.String(nullable=True),
       'ingredients': fields.List(
          fields.Nested(ingredient_fields),
-         required=True,
          description='The ingredients & associated annotations'),
       'steps': fields.List(
          fields.Nested(step_fields),
-         required=True,
          description='The steps & associated annotations'),
       'tags': fields.List(fields.String,
-         nullable=True,
          description='Tags associated with this recipe')
    })
 
