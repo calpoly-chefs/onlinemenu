@@ -23,6 +23,14 @@ class RecipeDto:
       'number': fields.Integer
    })
 
+   image_metadata = api.model('image_metadata', {
+      'url': fields.String,
+      'username': fields.String,
+      'profile_image': fields.String,
+      'is_remix': fields.Boolean,
+      'recipe_id': fields.Integer
+   })
+
    recipe_short = api.model('recipe_short', {
       'title': fields.String,
       'id': fields.Integer,
@@ -81,7 +89,10 @@ class RecipeDto:
       'liked': fields.Boolean(default=False, required=False),
       'description': fields.String,
       'featured_image': fields.String,
-      'images': fields.List(fields.String),
+      'owner_images': fields.List(fields.String),
+      'community_images': fields.List(
+         fields.Nested(image_metadata)
+      ),
       'remixes': fields.List(
          fields.Nested(recipe_short),
          required=False,

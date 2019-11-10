@@ -17,8 +17,6 @@ class Recipe(db.Model):
    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
    title = db.Column(db.String(255), nullable=False)
    created_on = db.Column(db.DateTime, nullable=False)
-   featured_image = db.Column(db.String(255), nullable=True)
-   images = db.Column(db.ARRAY(db.String(255), dimensions=1), nullable=True)
    cooktime = db.Column(db.String(255), nullable=False)
    preptime = db.Column(db.String(255), nullable=False)
    totaltime = db.Column(db.String(255), nullable=False)
@@ -32,6 +30,11 @@ class Recipe(db.Model):
    calories = db.Column(db.Integer, nullable=True)
    cost = db.Column(db.Float, nullable=True)
    description = db.Column(db.Text)
+   f_image = db.Column(db.Integer, nullable=True)
+   images = db.relationship('Image',
+      order_by='Image.id',
+      backref='recipe',
+      cascade='all,delete,delete-orphan')
    ingredients = db.relationship('Ingredient',
       order_by='Ingredient.number',
       collection_class=ordering_list('number', count_from=1),
@@ -55,6 +58,21 @@ class Recipe(db.Model):
                 where(Recipe.parent_id == cls.id).\
                 label("remix_count")
       return q
+      
+   @hybrid_property
+   def featured_image(self):
+      if self.f_image is not None:
+         return self.images[self.f_image]
+      return None
+
+   @hybrid_property
+   def community_images(self):
+      return (list(filter(lambda img: img.username != self.username, self.images))
+            + [r.featured_image for r in self.remixes if r.featured_image is not None])
+   
+   @hybrid_property
+   def owner_images(self):
+      return list(filter(lambda img: img.username == self.username, self.images))
 
    @hybrid_property
    def likes_count(self):

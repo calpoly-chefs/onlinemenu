@@ -7,6 +7,7 @@ from app.main.config import Config
 from app.main.model.recipe import Recipe, Step, Ingredient
 from app.main.model.tag import Tag
 from app.main.model.user import User, likes
+from app.main.model.image import Image
 
 #TODO remove - only for debugging
 import sys
@@ -15,7 +16,7 @@ import sys
 def add_one_image(user, recipe_id, img):
 
    rec = Recipe.query.filter_by(id=recipe_id).first()
-   if rec is None or rec.username != user:
+   if rec is None or rec.public != True:
       return {
          'status': 'fail',
          'message': 'Could not find recipe',
@@ -34,13 +35,11 @@ def add_one_image(user, recipe_id, img):
                       ContentType='image/png')
 
    # workaround to add image to array
-   imgs = []
-   if rec.images != None:
-      imgs = rec.images.copy()
    img_name = "{}/{}".format(Config.CDN_URL, img_name)
-   imgs.append(img_name)
-   rec.images = imgs
-
+   img = Image(url=img_name, username=user)
+   rec.images.append(img)
+   
+   db.session.add(img)
    db.session.add(rec)
    db.session.commit()
 
@@ -66,7 +65,7 @@ def update_recipe(data, user, recipe_id):
    rec.cooktime = data['cooktime'] if 'cooktime' in data else rec.cooktime
    rec.preptime = data['preptime'] if 'preptime' in data else rec.preptime
    rec.totaltime = data['totaltime'] if 'totaltime' in data else rec.totaltime
-   rec.featured_image = data['featured_image'] if 'featured_image' in data else rec.featured_image
+   rec.f_image = data['featured_image'] if 'featured_image' in data else rec.f_image
    rec.description = data['description'] if 'description' in data else rec.description
    rec.difficulty = data['difficulty'] if 'difficulty' in data else rec.difficulty
    rec.public = data['public'] if 'public' in data else rec.public

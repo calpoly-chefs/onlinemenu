@@ -12,6 +12,8 @@ from app.main.model import user
 from app.main.model import blacklist
 from app.main.model import recipe
 from app.main.model import tag
+from app.main.model import challenge
+from app.main.model import image
 
 application = app = create_app('prod')
 app.register_blueprint(blueprint)
