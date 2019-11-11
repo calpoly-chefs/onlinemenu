@@ -1,4 +1,4 @@
-[3]  Change ingredient/step text on put request
+[X]  Change ingredient/step text on put request
 [ ]  lack of signed url is a possible vulnerability to access non public recipes
 [5]  Author (source) column, default to username if null (restrict to usernames)
 [X]  Accept totally null recipe for stub creation, and put with ingredients & steps but no tags

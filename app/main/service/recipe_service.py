@@ -38,6 +38,9 @@ def add_one_image(user, recipe_id, img):
    img = Image(url=img_name, username=user)
    rec.images.append(img)
 
+   if len(rec.images) == 1:
+      rec.f_image = 0
+
    db.session.add(img)
    db.session.add(rec)
    db.session.commit()
